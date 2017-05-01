@@ -4,6 +4,8 @@ import ApiCSettings
 import ApiCStatus
 import ApiCRecipes
 import ApiCSteps
+import ApiCBrew
+import ApiCHistory
 
 app = Flask(__name__)
 
@@ -69,10 +71,51 @@ def getStep(stepId):
     return ApiCSteps.GetStep(stepId)
 #endregion
 
+#region "Brew"
+@app.route("/homebrew/api/v1.0/brew/<int:recipeId>", methods=['GET'])
+def setBrew(recipeId):
+    return ApiCBrew.SetBrew(recipeId)
+
+@app.route("/homebrew/api/v1.0/brew/nextStep")
+def nextStep():
+    return ApiCBrew.NextStep()
+
+@app.route("/homebrew/api/v1.0/brew/clear")
+def clearCurrentBrew():
+    return ApiCBrew.ClearCurrentBrew()
+
+@app.route("/homebrew/api/v1.0/brew")
+def getCurrentBrew():
+    return ApiCBrew.GetCurrentBrew()
+#endregion
+
+#region "History"
+@app.route("/homebrew/api/v1.0/history", methods=['GET'])
+def getHistories():
+    return ApiCHistory.GetHistories()
+
+@app.route("/homebrew/api/v1.0/history/<int:historyId>", methods=['GET'])
+def getHistory(historyId):
+    return ApiCHistory.GetHistory(historyId)
+
+@app.route("/homebrew/api/v1.0/logs/<int:historyId>", methods=['GET'])
+def getLogs(historyId):
+    return ApiCHistory.GetLogs(historyId)
+#endregion
+
+#region "Current Status"
 @app.route('/homebrew/api/v1.0/currentStatus', methods=['GET'])
 def getCurrentStatus():
     return ApiCStatus.getStatus()
 
+@app.route('/homebrew/api/v1.0/forcePumpOff/<bool:isOff>', methods=['GET'])
+def forcePumpOff(isOff):
+    return ApiCStatus.ForcePumpOff(isOff)
+
+@app.route('/homebrew/api/v1.0/forceHeaterOff/<bool:isOff>', methods=['GET'])
+def forceHeaterOff(isOff):
+    return ApiCStatus.ForceHeaterOff(isOff)
+#endregion
 
 
 

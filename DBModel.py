@@ -13,7 +13,7 @@ class DBModel(object):
         c.execute("CREATE TABLE if not exists 'CurrentBrew' ('RecipeId' INTEGER, 'StepId' INTEGER, 'StartDate' INTEGER, 'StepStart' INTEGER, 'HistoryId' INTEGER)")
         c.execute("CREATE TABLE if not exists 'BrewHistory' ('Id' INTEGER PRIMARY KEY AUTOINCREMENT, 'RecipeId' INTEGER, 'Date' INTEGER)")
         c.execute("CREATE TABLE if not exists 'BrewHistoryLog' ('BrewHistoryId' INTEGER, 'DateTime' INTEGER, 'StepId' INTEGER, 'TempRead' REAL, 'PumpOn' INTEGER, 'HeaterOn' INTEGER)")
-        c.execute("CREATE TABLE if not exists 'CurrentStatus' ('CurrentTemp' REAL, 'IsPumpOn' INTEGER, 'IsHeaterOn' INTEGER)")
+        c.execute("CREATE TABLE if not exists 'CurrentStatus' ('CurrentTemp' REAL, 'IsPumpOn' INTEGER, 'IsHeaterOn' INTEGER, 'ForcePumpOff' INTEGER, 'ForceHeaterOff' INTEGER)")
         c.execute("SELECT Count(*) FROM CurrentStatus")
         row = c.fetchone()
         if row[0] == 0:
@@ -153,14 +153,20 @@ class DBModel(object):
     def SetBrew(self, recipeId):
         conn = sqlite3.connect(self.DBName)
         c = conn.cursor()
-        c.execute("DELETE FROM 'CurrentBrew'")
-        conn.execute()
+        c.execute("DELETE FROM CurrentBrew")
+        conn.commit()
         recipe = (recipeId, )
-        c.execute("SELECT 'Id' FROM 'RecipeSteps' WHERE RecipeId = ? ORDER BY Id DESC", recipe)
+        c.execute("SELECT Id FROM 'RecipeSteps' WHERE RecipeId = ? AND IsDeleted = 0 ORDER BY Id ASC", recipe)
         row = c.fetchone()
-        historyId = AddHistory(recipeId)
-        recipe = (recipeId,row[0],int(time.time(), historyId))
-        c.execute("INSERT INTO 'CurrentBrew' (RecipeId, StepId, StartDate, StepStart) VALUES (?, ?, ?, null, ?)", recipe)
+
+        history = (recipeId, int(time.time()))
+        c.execute("INSERT INTO 'BrewHistory' (RecipeId, Date) VALUES (?, ?)", history)
+        conn.commit()
+        c.execute("SELECT last_insert_rowid()")
+        rowh = c.fetchone()
+
+        recipe = (recipeId,row[0],int(time.time()), int(time.time()), rowh[0])
+        c.execute("INSERT INTO 'CurrentBrew' (RecipeId, StepId, StartDate, StepStart, HistoryId) VALUES (?, ?, ?, ?, ?)", recipe)
         conn.commit()
         conn.close()
     
@@ -170,7 +176,7 @@ class DBModel(object):
         c.execute("SELECT RecipeId, StepId FROM 'CurrentBrew'")
         row = c.fetchone()
         recipe = (row[0], row[1])
-        c.execute("SELECT 'Id' FROM 'RecipeSteps' WHERE RecipeId = ? AND Id > ? ORDER BY Id DESC", recipe)
+        c.execute("SELECT Id FROM 'RecipeSteps' WHERE RecipeId = ? AND Id > ? AND IsDeleted = 0 ORDER BY Id ASC", recipe)
         row = c.fetchone()
         recipe = (row[0], int(time.time()))
         c.execute("UPDATE 'CurrentBrew' SET StepId = ?, StepStart = ?", recipe)
@@ -187,7 +193,7 @@ class DBModel(object):
     def GetCurrentBrew(self):
         conn = sqlite3.connect(self.DBName)
         c = conn.cursor()
-        c.Execute("SELECT * FROM 'CurrentBrew'")
+        c.execute("SELECT * FROM 'CurrentBrew'")
         row = c.fetchone()
         conn.close()
         return row
@@ -269,5 +275,21 @@ class DBModel(object):
         c = conn.cursor()
         t = (heaterOn,)
         c.execute("UPDATE CurrentStatus SET IsHeaterOn = ?", t)
+        conn.commit()
+        conn.close()
+
+    def ForcePumpOff(self, isOff):
+        conn = sqlite3.connect(self.DBName)
+        c = conn.cursor()
+        off = (isOff, )
+        c.execute("UPDATE CurrentStatus SET ForcePumpOff = ?", off)
+        conn.commit()
+        conn.close()
+
+    def ForceHeaterOff(self, isOff):
+        conn = sqlite3.connect(self.DBName)
+        c = conn.cursor()
+        off = (isOff, )
+        c.execute("UPDATE CurrentStatus SET ForceHeaterOff = ?", off)
         conn.commit()
         conn.close()
