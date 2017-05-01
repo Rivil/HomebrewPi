@@ -109,7 +109,7 @@ class DBModel(object):
         conn = sqlite3.connect(self.DBName)
         c = conn.cursor()
         step = (recipeId, name, tempSet, timeSet, isOnTimer, pumpOn, heaterOn)
-        c.execute("INSERT INTO 'RecipeSteps' (RecipeId, StepName, TempSet, TimeSet, IsOnTimer, PumpOn, HeaterOn, IsDeleted) VALUES (?,?,?,?,?,?,?,0)")
+        c.execute("INSERT INTO 'RecipeSteps' (RecipeId, StepName, TempSet, TimeSet, IsOnTimer, PumpOn, HeaterOn, IsDeleted) VALUES (?,?,?,?,?,?,?,0)", step)
         conn.commit()
         c.execute("SELECT last_insert_rowid()")
         row = c.fetchone()
@@ -128,7 +128,7 @@ class DBModel(object):
         conn = sqlite3.connect(self.DBName)
         c = conn.cursor()
         step = (name, tempSet, timeSet, isOnTimer, pumpOn, heaterOn, stepId)
-        c.execute("UPDATE 'RecipeSteps' SET StepName = ?, TempSet = ?, TimeSet = ?, IsOnTimer = ?, PumpOn = ?, HeaterOn = ? WHERE StepId = ?", step)
+        c.execute("UPDATE 'RecipeSteps' SET StepName = ?, TempSet = ?, TimeSet = ?, IsOnTimer = ?, PumpOn = ?, HeaterOn = ? WHERE Id = ?", step)
         conn.commit()
         conn.close()
 
