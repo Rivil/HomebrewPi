@@ -1,5 +1,5 @@
 from flask import jsonify
-import datetime
+import Classes.Recipe
 import DBModel
 db = DBModel.DBModel()
 
@@ -18,22 +18,23 @@ def GetRecipes():
     rows = db.GetRecipes()
     returnValue = []
     for row in rows:
+        rec = Classes.Recipe.Recipe(row)
         jsonRow = {}
         jsonRow['Recipe']={
-            'Id': row[0],
-            'DateCreated': datetime.datetime.fromtimestamp(row[1]),
-            'Name': row[2],
-            'IsDeleted': row[3]
+            'Id': rec.Id,
+            'DateCreated': rec.DateCreated,
+            'Name': rec.Name,
+            'IsDeleted': rec.IsDeleted
             }
         returnValue.append(jsonRow)
     return jsonify(returnValue)
 
 def GetRecipe(recipeId):
-    row = db.GetRecipe(recipeId)
+    rec = Classes.Recipe.Recipe(db.GetRecipe(recipeId))
     returnValue = {
-        'Id': row[0],
-        'DateCreated': datetime.datetime.fromtimestamp(row[1]),
-        'Name': row[2],
-        'IsDeleted': row[3]
+        'Id': rec.Id,
+        'DateCreated': rec.DateCreated,
+        'Name': rec.Name,
+        'IsDeleted': rec.IsDeleted
         }
     return jsonify(returnValue)

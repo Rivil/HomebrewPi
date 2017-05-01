@@ -17,7 +17,7 @@ class DBModel(object):
         c.execute("SELECT Count(*) FROM CurrentStatus")
         row = c.fetchone()
         if row[0] == 0:
-            c.execute("INSERT INTO CurrentStatus (CurrentTemp, IsPumpOn, IsHeaterOn) VALUES (0,0,0)")
+            c.execute("INSERT INTO CurrentStatus (CurrentTemp, IsPumpOn, IsHeaterOn, ForcePumpOff, ForceHeaterOff) VALUES (0,0,0,0,0)")
         conn.commit()
         conn.close()
 

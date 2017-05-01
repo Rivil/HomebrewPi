@@ -1,6 +1,7 @@
 from flask import jsonify
 import datetime
 import DBModel
+import Classes.CurrentBrew
 db = DBModel.DBModel()
 
 
@@ -17,14 +18,14 @@ def ClearCurrentBrew():
     return jsonify({'result': 'OK'}),200
 
 def GetCurrentBrew():
-    row = db.GetCurrentBrew()
-    if row is not None:
+    brew = Classes.CurrentBrew.CurrentBrew(db.GetCurrentBrew())
+    if brew.HasBrew:
         returnValue = {
-            'RecipeId': row[0],
-            'StepId': row[1],
-            'StartDate': datetime.datetime.fromtimestamp(row[2]),
-            'StepStart': datetime.datetime.fromtimestamp(row[3]),
-            'HistoryId': row[4]
+            'RecipeId': brew.RecipeId,
+            'StepId': brew.StepId,
+            'StartDate': brew.StartDate,
+            'StepStart': brew.StepStart,
+            'HistoryId': brew.HistoryId
             }
         return jsonify(returnValue)
     else:

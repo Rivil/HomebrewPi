@@ -1,5 +1,5 @@
 from flask import jsonify
-import datetime
+import Classes.Step
 import DBModel
 db = DBModel.DBModel()
 
@@ -18,32 +18,33 @@ def GetSteps(recipeId):
     rows = db.GetSteps(recipeId)
     returnValue = []
     for row in rows:
+        s = Classes.Step.Step(row)
         jsonRow = {}
         jsonRow['Step']={
-            'Id': row[0],
-            'RecipeId': row[1],
-            'StepName': row[2],
-            'TempSet': row[3],
-            'TimeSet': row[4],
-            'IsOnTimer': bool(row[5]),
-            'PumpOn': bool(row[6]),
-            'HeaterOn': bool(row[7]),
-            'IsDeleted': bool(row[8])
+            'Id': s.Id,
+            'RecipeId': s.RecipeId,
+            'StepName': s.StepName,
+            'TempSet': s.TempSet,
+            'TimeSet': s.TimeSet,
+            'IsOnTimer': s.IsOnTimer,
+            'PumpOn': s.PumpOn,
+            'HeaterOn': s.HeaterOn,
+            'IsDeleted': s.IsDeleted
             }
         returnValue.append(jsonRow)
     return jsonify(returnValue)
     
 def GetStep(stepId):
-    row = db.GetStep(stepId)
+    s = Classes.Step.Step(db.GetStep(stepId))
     returnValue = {
-        'Id': row[0],
-        'RecipeId': row[1],
-        'StepName': row[2],
-        'TempSet': row[3],
-        'TimeSet': row[4],
-        'IsOnTimer': bool(row[5]),
-        'PumpOn': bool(row[6]),
-        'HeaterOn': bool(row[7]),
-        'IsDeleted': bool(row[8])
+        'Id': s.Id,
+        'RecipeId': s.RecipeId,
+        'StepName': s.StepName,
+        'TempSet': s.TempSet,
+        'TimeSet': s.TimeSet,
+        'IsOnTimer': s.IsOnTimer,
+        'PumpOn': s.PumpOn,
+        'HeaterOn': s.HeaterOn,
+        'IsDeleted': s.IsDeleted
         }
     return jsonify(returnValue)

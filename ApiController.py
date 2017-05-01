@@ -1,120 +1,120 @@
 from flask import  Flask, jsonify, request
 
-import ApiCSettings
-import ApiCStatus
-import ApiCRecipes
-import ApiCSteps
-import ApiCBrew
-import ApiCHistory
+import ApiControllers.ApiCSettings
+import ApiControllers.ApiCStatus
+import ApiControllers.ApiCRecipes
+import ApiControllers.ApiCSteps
+import ApiControllers.ApiCBrew
+import ApiControllers.ApiCHistory
 
 app = Flask(__name__)
 
 #region "Settings"
 @app.route('/homebrew/api/v1.0/settings/<string:settingName>', methods=['GET'])
 def getSetting(settingName):
-    return ApiCSettings.getSetting(settingName)
+    return ApiControllers.ApiCSettings.getSetting(settingName)
 
 @app.route("/homebrew/api/v1.0/settings", methods=['GET'])
 def getSettings():
-    return ApiCSettings.getSettings()
+    return ApiControllers.ApiCSettings.getSettings()
 
 @app.route("/homebrew/api/v1.0/settings", methods=['POST'])
 def setSettings():
-    return ApiCSettings.setSetting(request.json.get('SettingName', ""), request.json.get('SettingValue', ""))
+    return ApiControllers.ApiCSettings.setSetting(request.json.get('SettingName', ""), request.json.get('SettingValue', ""))
 
 @app.route("/homebrew/api/v1.0/setting/<string:settingName>", methods=['DELETE'])
 def deleteSetting(settingName):
-    return ApiCSettings.deleteSetting(settingName)
+    return ApiControllers.ApiCSettings.deleteSetting(settingName)
 #endregion
 
 #region "Recipes"
 @app.route("/homebrew/api/v1.0/recipes", methods=['POST'])
 def addRecipe():
-    return ApiCRecipes.AddReciepe(request.json.get('RecipeName', ""))
+    return ApiControllers.ApiCRecipes.AddReciepe(request.json.get('RecipeName', ""))
 
 @app.route("/homebrew/api/v1.0/recipes/<int:recipeId>", methods=['DELETE'])
 def deleteRecipe(recipeId):
-    return ApiCRecipes.DeleteRecipe(recipeId)
+    return ApiControllers.ApiCRecipes.DeleteRecipe(recipeId)
 
 @app.route("/homebrew/api/v1.0/recipes/<int:recipeId>", methods=['PUT'])
 def updateRecipe(recipeId):
-    return ApiCRecipes.UpdateRecipe(recipeId, request.json.get('RecipeName', ""))
+    return ApiControllers.ApiCRecipes.UpdateRecipe(recipeId, request.json.get('RecipeName', ""))
 
 @app.route("/homebrew/api/v1.0/recipes", methods=['GET'])
 def getRecipes():
-    return ApiCRecipes.GetRecipes()
+    return ApiControllers.ApiCRecipes.GetRecipes()
 
 @app.route("/homebrew/api/v1.0/recipe/<int:recipeId>", methods=['GET'])
 def getRecipe(recipeId):
-    return ApiCRecipes.GetRecipe(recipeId)
+    return ApiControllers.ApiCRecipes.GetRecipe(recipeId)
 #endregion
 
 #region "Steps"
 @app.route("/homebrew/api/v1.0/steps", methods=['POST'])
 def addStep():
-    return ApiCSteps.AddStep(request.json.get('RecipeId', ""), request.json.get('StepName', ""), request.json.get('TempSet', ""), request.json.get('TimeSet', ""), request.json.get('IsOnTimer', ""), request.json.get('PumpOn', ""), request.json.get('HeaterOn', ""))
+    return ApiControllers.ApiCSteps.AddStep(request.json.get('RecipeId', ""), request.json.get('StepName', ""), request.json.get('TempSet', ""), request.json.get('TimeSet', ""), request.json.get('IsOnTimer', ""), request.json.get('PumpOn', ""), request.json.get('HeaterOn', ""))
 
 @app.route("/homebrew/api/v1.0/steps/<int:stepId>", methods=['DELETE'])
 def deleteStep(stepId):
-    return ApiCSteps.DeleteStep(stepId)
+    return ApiControllers.ApiCSteps.DeleteStep(stepId)
 
 @app.route("/homebrew/api/v1.0/steps/<int:stepId>", methods=['PUT'])
 def updateStep(stepId):
-    return ApiCSteps.UpdateStep(stepId, request.json.get('StepName', ""), request.json.get('TempSet', ""), request.json.get('TimeSet', ""), request.json.get('IsOnTimer', ""), request.json.get('PumpOn', ""), request.json.get('HeaterOn', ""))
+    return ApiControllers.ApiCSteps.UpdateStep(stepId, request.json.get('StepName', ""), request.json.get('TempSet', ""), request.json.get('TimeSet', ""), request.json.get('IsOnTimer', ""), request.json.get('PumpOn', ""), request.json.get('HeaterOn', ""))
 
 @app.route("/homebrew/api/v1.0/steps/<int:recipeId>", methods=['GET'])
 def getSteps(recipeId):
-    return ApiCSteps.GetSteps(recipeId)
+    return ApiControllers.ApiCSteps.GetSteps(recipeId)
 
 @app.route("/homebrew/api/v1.0/step/<int:stepId>", methods=['GET'])
 def getStep(stepId):
-    return ApiCSteps.GetStep(stepId)
+    return ApiControllers.ApiCSteps.GetStep(stepId)
 #endregion
 
 #region "Brew"
 @app.route("/homebrew/api/v1.0/brew/<int:recipeId>", methods=['GET'])
 def setBrew(recipeId):
-    return ApiCBrew.SetBrew(recipeId)
+    return ApiControllers.ApiCBrew.SetBrew(recipeId)
 
 @app.route("/homebrew/api/v1.0/brew/nextStep")
 def nextStep():
-    return ApiCBrew.NextStep()
+    return ApiControllers.ApiCBrew.NextStep()
 
 @app.route("/homebrew/api/v1.0/brew/clear")
 def clearCurrentBrew():
-    return ApiCBrew.ClearCurrentBrew()
+    return ApiControllers.ApiCBrew.ClearCurrentBrew()
 
 @app.route("/homebrew/api/v1.0/brew")
 def getCurrentBrew():
-    return ApiCBrew.GetCurrentBrew()
+    return ApiControllers.ApiCBrew.GetCurrentBrew()
 #endregion
 
 #region "History"
 @app.route("/homebrew/api/v1.0/history", methods=['GET'])
 def getHistories():
-    return ApiCHistory.GetHistories()
+    return ApiControllers.ApiCHistory.GetHistories()
 
 @app.route("/homebrew/api/v1.0/history/<int:historyId>", methods=['GET'])
 def getHistory(historyId):
-    return ApiCHistory.GetHistory(historyId)
+    return ApiControllers.ApiCHistory.GetHistory(historyId)
 
 @app.route("/homebrew/api/v1.0/logs/<int:historyId>", methods=['GET'])
 def getLogs(historyId):
-    return ApiCHistory.GetLogs(historyId)
+    return ApiControllers.ApiCHistory.GetLogs(historyId)
 #endregion
 
 #region "Current Status"
 @app.route('/homebrew/api/v1.0/currentStatus', methods=['GET'])
 def getCurrentStatus():
-    return ApiCStatus.getStatus()
+    return ApiControllers.ApiCStatus.getStatus()
 
-@app.route('/homebrew/api/v1.0/forcePumpOff/<bool:isOff>', methods=['GET'])
+@app.route('/homebrew/api/v1.0/forcePumpOff/<string:isOff>', methods=['GET'])
 def forcePumpOff(isOff):
-    return ApiCStatus.ForcePumpOff(isOff)
+    return ApiControllers.ApiCStatus.ForcePumpOff(isOff)
 
-@app.route('/homebrew/api/v1.0/forceHeaterOff/<bool:isOff>', methods=['GET'])
+@app.route('/homebrew/api/v1.0/forceHeaterOff/<string:isOff>', methods=['GET'])
 def forceHeaterOff(isOff):
-    return ApiCStatus.ForceHeaterOff(isOff)
+    return ApiControllers.ApiCStatus.ForceHeaterOff(isOff)
 #endregion
 
 
