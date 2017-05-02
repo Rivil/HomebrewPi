@@ -13,13 +13,22 @@ class DBModel(object):
         c.execute("CREATE TABLE if not exists 'CurrentBrew' ('RecipeId' INTEGER, 'StepId' INTEGER, 'StartDate' INTEGER, 'StepStart' INTEGER, 'HistoryId' INTEGER)")
         c.execute("CREATE TABLE if not exists 'BrewHistory' ('Id' INTEGER PRIMARY KEY AUTOINCREMENT, 'RecipeId' INTEGER, 'Date' INTEGER)")
         c.execute("CREATE TABLE if not exists 'BrewHistoryLog' ('BrewHistoryId' INTEGER, 'DateTime' INTEGER, 'StepId' INTEGER, 'TempRead' REAL, 'PumpOn' INTEGER, 'HeaterOn' INTEGER)")
-        c.execute("CREATE TABLE if not exists 'CurrentStatus' ('CurrentTemp' REAL, 'IsPumpOn' INTEGER, 'IsHeaterOn' INTEGER, 'ForcePumpOff' INTEGER, 'ForceHeaterOff' INTEGER)")
+        c.execute("CREATE TABLE if not exists 'CurrentStatus' ('CurrentTemp' REAL, 'IsPumpOn' INTEGER, 'IsHeaterOn' INTEGER, 'ForcePumpOff' INTEGER, 'ForceHeaterOff' INTEGER, 'PWMSetting' INTEGER)")
         c.execute("SELECT Count(*) FROM CurrentStatus")
         row = c.fetchone()
         if row[0] == 0:
             c.execute("INSERT INTO CurrentStatus (CurrentTemp, IsPumpOn, IsHeaterOn, ForcePumpOff, ForceHeaterOff) VALUES (0,0,0,0,0)")
         conn.commit()
         conn.close()
+        self.InsertSettingIfNotExists("csPin", "24")
+        self.InsertSettingIfNotExists("misoPin", "21")
+        self.InsertSettingIfNotExists("mosiPin", "19")
+        self.InsertSettingIfNotExists("clkPin", "23")
+        self.InsertSettingIfNotExists("PumpOnPin", "11")
+        self.InsertSettingIfNotExists("HeaterOnPin", "33")
+        self.InsertSettingIfNotExists("BoardNumerationType", "BOARD")
+        self.InsertSettingIfNotExists("UsePWM", "True")
+        self.InsertSettingIfNotExists("FanControlPin", "13")
 
     def GetSettings(self):
         conn = sqlite3.connect(self.DBName)
@@ -51,6 +60,17 @@ class DBModel(object):
             setting = (settingName, settingValue)
             c.execute("INSERT INTO 'Settings' (SettingName, Value) VALUES (?, ?)", setting)
         conn.commit()
+        conn.close()
+
+    def InsertSettingIfNotExists(self, settingName, settingValue):
+        conn = sqlite3.connect(self.DBName)
+        c = conn.cursor()
+        setting = (settingName, settingValue)
+        c.execute("SELECT EXISTS(SELECT 1 FROM 'Settings' WHERE SettingName = ?)", setting)
+        row = c.fetchone()
+        if not row[0]:
+            c.execute("INSERT INTO Settings (SettingName, Value) VALUES (?, ?)", setting)
+            conn.commit()
         conn.close()
 
     def DeleteSetting(self, settingName):
@@ -291,5 +311,13 @@ class DBModel(object):
         c = conn.cursor()
         off = (isOff, )
         c.execute("UPDATE CurrentStatus SET ForceHeaterOff = ?", off)
+        conn.commit()
+        conn.close()
+
+    def UpdatePWMSetting(self, pwmSetting)
+        conn = sqlite3.connect(self.DBName)
+        c = conn.cursor()
+        pwm = (pwmSetting,)
+        c.execute("UPDATE CurrentStatus SET PWMSetting = ?", pwm)
         conn.commit()
         conn.close()

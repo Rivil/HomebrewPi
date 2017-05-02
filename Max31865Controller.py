@@ -34,16 +34,20 @@ class max31865(object):
 	   3rd and 4th degree parts of the polynomial) and the straight line approx.
 	   temperature is calculated with the quadratic formula one being the most accurate.
 	"""
-	def __init__(self, csPin = 8, misoPin = 9, mosiPin = 10, clkPin = 11):
+	def __init__(self, csPin = 8, misoPin = 9, mosiPin = 10, clkPin = 11, boardText = "BOARD"):
 		self.csPin = csPin
 		self.misoPin = misoPin
 		self.mosiPin = mosiPin
 		self.clkPin = clkPin
-		self.setupGPIO()
+		if boardText == "BOARD":
+			b = GPIO.BOARD
+		else :
+			b = GPIO.BCM
+		self.setupGPIO(b)
 		
-	def setupGPIO(self):
+	def setupGPIO(self, board):
 		GPIO.setwarnings(False) 
-		GPIO.setmode(GPIO.BOARD)
+		GPIO.setmode(board)
 		GPIO.setup(self.csPin, GPIO.OUT)
 		GPIO.setup(self.misoPin, GPIO.IN)
 		GPIO.setup(self.mosiPin, GPIO.OUT)

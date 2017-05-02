@@ -10,7 +10,8 @@ def GetCurrentStatus():
         'IsPumpOn': s.IsPumpOn,
         'IsHeaterOn': s.IsHeaterOn,
         'ForcePumpOff': s.ForcePumpOff,
-        'ForceHeaterOff': s.ForceHeaterOff
+        'ForceHeaterOff': s.ForceHeaterOff, 
+        'PWMSetting': s.PWMSetting
         }
     return jsonify(returnValue)
 
