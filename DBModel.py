@@ -314,7 +314,7 @@ class DBModel(object):
         conn.commit()
         conn.close()
 
-    def UpdatePWMSetting(self, pwmSetting)
+    def UpdatePWMSetting(self, pwmSetting):
         conn = sqlite3.connect(self.DBName)
         c = conn.cursor()
         pwm = (pwmSetting,)
